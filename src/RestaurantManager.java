@@ -131,7 +131,13 @@ public class RestaurantManager extends ArrayList<Order> {
 
     public String getTableOrder(int tableNumber) {
         StringBuilder returnString = new StringBuilder();
-        returnString.append("** Objednávky pro stůl č. ").append(tableNumber).append(" **\n").append("****\n");
+        returnString.append("** Objednávky pro stůl č. ");
+        StringBuilder tableNumberFormatted = new StringBuilder();
+        if (tableNumber < 10) {
+            tableNumberFormatted.append(0);
+        }
+        tableNumberFormatted.append(tableNumber);
+        returnString.append(tableNumberFormatted).append(" **\n").append("****\n");
         final int[] id = {1};
         this.stream().filter(order -> order.getTableNumber() == tableNumber).forEach(filteredOrder -> {
 
