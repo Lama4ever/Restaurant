@@ -65,8 +65,30 @@ public class Order {
         return orderedTime;
     }
 
+    public String getOrderedTimeFormatted() {
+        return Settings.DATE_FORMAT_CZ.format(orderedTime);
+    }
+
     public LocalDateTime getFulfilmentTime() {
         return fulfilmentTime;
+    }
+
+    public String getFulfilmentTimeFormatted() {
+        if(fulfilmentTime!=null) return Settings.DATE_FORMAT_CZ.format(fulfilmentTime);
+        else return "";
+    }
+
+    public String getSaveData()
+    {
+        StringBuilder saveData = new StringBuilder();
+        saveData.append(tableNumber).append(Settings.DELIMITER)
+                .append(getDish().getId()).append(Settings.DELIMITER)
+                .append(dishCount).append(Settings.DELIMITER)
+                .append(getOrderedTime()).append(Settings.DELIMITER);
+        if(getFulfilmentTime() != null) saveData.append(getFulfilmentTime()).append(Settings.DELIMITER);
+        if(isPaid()) saveData.append(isPaid()).append(Settings.DELIMITER);
+        saveData.append("\n");
+        return saveData.toString();
     }
 
     public long getDuration()

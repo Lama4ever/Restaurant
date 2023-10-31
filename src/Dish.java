@@ -39,6 +39,18 @@ public class Dish {
         return id;
     }
 
+    public String getSaveData()
+    {
+        StringBuilder saveData = new StringBuilder();
+        saveData.append(name).append(Settings.DELIMITER)
+                .append(price).append(Settings.DELIMITER)
+                .append(preparationTime).append(Settings.DELIMITER)
+                .append(foto).append(Settings.DELIMITER);
+        otherFoto.forEach(s -> saveData.append(s).append(Settings.DELIMITER));
+        saveData.append("\n");
+        return saveData.toString();
+    }
+
     public void setName(String name) {
         this.name = name;
     }

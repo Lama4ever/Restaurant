@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -60,6 +58,24 @@ public class RestaurantManager extends ArrayList<Order> {
         }
     }
 
+    public void save() throws RestaurantException {
+        File ordersFile = new File(Settings.PATH + Settings.ORDERSFILE);
+        if (!ordersFile.exists()) {
+            try {
+                ordersFile.createNewFile();
+            } catch (IOException e) {
+                throw new RestaurantException("Cannot create file: " + Settings.PATH + Settings.ORDERSFILE);
+            }
+        }
+        try (PrintWriter writter = new PrintWriter(new BufferedWriter(new FileWriter(ordersFile)))) {
+            StringBuilder data = new StringBuilder();
+            this.forEach(order -> data.append(order.getSaveData()));
+            writter.print(data);
+        } catch (IOException e) {
+            throw new RestaurantException("Cannot write to file: " + Settings.PATH + Settings.ORDERSFILE);
+        }
+    }
+
     public String sortOrderedTime() {
         StringBuilder returnString = new StringBuilder();
         ArrayList<Order> sortedList = new ArrayList<>(this);
@@ -73,7 +89,7 @@ public class RestaurantManager extends ArrayList<Order> {
             return 0;
         });
         for (Order order : sortedList) {
-            returnString.append(order.toString());
+            returnString.append(order.toString()).append("\n");
         }
         return returnString.toString();
     }
@@ -116,17 +132,19 @@ public class RestaurantManager extends ArrayList<Order> {
     public String getTableOrder(int tableNumber) {
         StringBuilder returnString = new StringBuilder();
         returnString.append("** Objednávky pro stůl č. ").append(tableNumber).append(" **\n").append("****\n");
+        final int[] id = {1};
         this.stream().filter(order -> order.getTableNumber() == tableNumber).forEach(filteredOrder -> {
-            int id = 0;
+
             returnString.append(String.format("%s. %s %sx (%s Kc) :\t %s-%s %s\n",
-                    id++,
+                    id[0],
                     filteredOrder.getDish().getName(),
                     filteredOrder.getDishCount(),
                     filteredOrder.getPrice(),
-                    filteredOrder.getOrderedTime(),
-                    filteredOrder.getFulfilmentTime(),
+                    filteredOrder.getOrderedTimeFormatted(),
+                    filteredOrder.getFulfilmentTimeFormatted(),
                     filteredOrder.isPaidString()
             ));
+            id[0]++;
         });
         returnString.append("******\n");
         return returnString.toString();
