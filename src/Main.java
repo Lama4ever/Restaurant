@@ -6,6 +6,7 @@ public class Main {
     public static RestaurantManager manager;
     public static CookBook cookBook;
     public static void main(String[] args) {
+        //Vit Pycha alias Lama4ever
         //create instances
         manager = new RestaurantManager();
         cookBook = new CookBook();
