@@ -13,47 +13,13 @@ public class RestaurantManager extends ArrayList<Order> {
         return count;
     }
 
-    public void loadOrders(String path, CookBook cookingBook) throws RestaurantException, FileNotFoundException {
+    public void loadOrders(String path, CookBook cookBook) throws RestaurantException, FileNotFoundException {
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(path)))) {
-            int lineNumber = 0;
+            int lineNumber = 1;
             while (scanner.hasNext()) {
                 String data = scanner.nextLine();
-                String[] parsedData = data.split(Settings.DELIMITER);
-                if (parsedData.length < 4)
-                    throw new RestaurantException("Error reading Order on line : " + lineNumber + " " + data);
-                int tableNumber;
-                int dishNumber;
-                int dishCount;
-                LocalDateTime orderedTime;
-                try {
-                    tableNumber = Integer.parseInt(parsedData[0]);
-                    dishNumber = Integer.parseInt(parsedData[1]);
-                    dishCount = Integer.parseInt(parsedData[2]);
-                    orderedTime = LocalDateTime.parse(parsedData[3]);
-                } catch (DateTimeParseException | NumberFormatException e) {
-                    throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
-                }
-                if (parsedData.length == 4) {
-                    this.add(new Order(tableNumber, cookingBook.getDishById(dishNumber), dishCount, orderedTime));
-                } else if (parsedData.length == 5) {
-                    LocalDateTime fulfilledTime;
-                    try {
-                        fulfilledTime = LocalDateTime.parse(parsedData[4]);
-                    } catch (DateTimeParseException e) {
-                        throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
-                    }
-                    this.add(new Order(tableNumber, cookingBook.getDishById(dishNumber), dishCount, orderedTime, fulfilledTime));
-                } else {
-                    LocalDateTime fulfilledTime;
-                    boolean paid;
-                    try {
-                        fulfilledTime = LocalDateTime.parse(parsedData[4]);
-                        paid = Boolean.parseBoolean(parsedData[5]);
-                    } catch (DateTimeParseException e) {
-                        throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
-                    }
-                    this.add(new Order(tableNumber, cookingBook.getDishById(dishNumber), dishCount, orderedTime, fulfilledTime, paid));
-                }
+                this.add(Order.parseData(data, lineNumber));
+                lineNumber++;
             }
         }
     }

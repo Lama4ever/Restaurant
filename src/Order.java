@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 public class Order {
@@ -116,5 +117,44 @@ public class Order {
                 ", fulfilmentTime=" + fulfilmentTime +
                 ", paid=" + paid +
                 '}';
+    }
+
+    public static Order parseData(String data, int lineNumber) throws RestaurantException {
+        String[] parsedData = data.split(Settings.DELIMITER);
+        if (parsedData.length < 4)
+            throw new RestaurantException("Error reading Order on line : " + lineNumber + " " + data);
+        int tableNumber;
+        int dishNumber;
+        int dishCount;
+        LocalDateTime orderedTime;
+        try {
+            tableNumber = Integer.parseInt(parsedData[0]);
+            dishNumber = Integer.parseInt(parsedData[1]);
+            dishCount = Integer.parseInt(parsedData[2]);
+            orderedTime = LocalDateTime.parse(parsedData[3]);
+        } catch (DateTimeParseException | NumberFormatException e) {
+            throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
+        }
+        if (parsedData.length == 4) {
+            return new Order(tableNumber, Main.cookBook.getDishById(dishNumber), dishCount, orderedTime);
+        } else if (parsedData.length == 5) {
+            LocalDateTime fulfilledTime;
+            try {
+                fulfilledTime = LocalDateTime.parse(parsedData[4]);
+            } catch (DateTimeParseException e) {
+                throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
+            }
+            return new Order(tableNumber, Main.cookBook.getDishById(dishNumber), dishCount, orderedTime, fulfilledTime);
+        } else {
+            LocalDateTime fulfilledTime;
+            boolean paid;
+            try {
+                fulfilledTime = LocalDateTime.parse(parsedData[4]);
+                paid = Boolean.parseBoolean(parsedData[5]);
+            } catch (DateTimeParseException e) {
+                throw new RestaurantException("Wrong format of data for Order on line: " + lineNumber + " " + data);
+            }
+            return new Order(tableNumber, Main.cookBook.getDishById(dishNumber), dishCount, orderedTime, fulfilledTime, paid);
+        }
     }
 }

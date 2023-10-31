@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Dish {
@@ -99,5 +100,27 @@ public class Dish {
                 ", foto='" + foto +
                 ", otherFoto=" + otherFoto +
                 '}';
+    }
+
+    public static Dish parseDish(String data, int lineNumber) throws RestaurantException {
+        String[] parsedData = data.split(Settings.DELIMITER);
+        if (parsedData.length < 3)
+            throw new RestaurantException("Error reading Dish on line : " + lineNumber + " " + data);
+        int price;
+        int preparationTime;
+        try {
+            price = Integer.parseInt(parsedData[1]);
+            preparationTime = Integer.parseInt(parsedData[2]);
+        } catch (NumberFormatException e) {
+            throw new RestaurantException("Wrong id format for Dish on line: " + lineNumber + " " + data);
+        }
+        if (parsedData.length == 3) {
+            return new Dish(parsedData[0], price, preparationTime);
+        } else if (parsedData.length == 4) {
+            return new Dish(parsedData[0], price, preparationTime, parsedData[3]);
+        } else {
+            List<String> otherFotos = new ArrayList<>(Arrays.asList(parsedData).subList(4, parsedData.length));
+            return new Dish(parsedData[0], price, preparationTime, parsedData[3], otherFotos);
+        }
     }
 }
